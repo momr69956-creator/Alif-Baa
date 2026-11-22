@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alif Baa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Scheherazade+New:wght@500&display=swap">
+<style>
+:root{
+  --bg:#FAF8F4; --surface:#FFFFFF; --ink:#1F1D1A; --muted:#8B857A;
+  --line:#E9E4DB; --accent:#0F6F5C; --accent-soft:#E6F1ED;
+  --sans:"Instrument Sans", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --arabic:"Scheherazade New", "Scheherazade", "Noto Naskh Arabic", "Geeza Pro", serif;
+  --shadow:0 1px 2px rgba(31,29,26,.05), 0 8px 24px -12px rgba(31,29,26,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:56px 20px 72px}
+header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:36px}
+h1{margin:0;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:-.01em}
+.ar-title{font-family:var(--arabic);font-size:46px;font-weight:500;color:var(--accent);line-height:1}
+.unit{margin-bottom:28px}
+.unit h2{margin:0 0 10px;font-size:15px;font-weight:600;color:var(--muted)}
+.list{display:grid;gap:10px}
+a.item{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:18px 20px;text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  transition:border-color .15s, transform .15s}
+a.item:hover{border-color:var(--accent);transform:translateY(-1px)}
+a.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.name{font-size:19px;font-weight:600}
+.meta{font-size:14px;color:var(--muted);margin-top:2px}
+.go{flex:none;width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-size:18px}
+@media (prefers-reduced-motion:reduce){a.item{transition:none}a.item:hover{transform:none}}
+@media (max-width:520px){.wrap{padding-top:36px}h1{font-size:34px}.ar-title{font-size:40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Alif Baa</h1>
+    <span class="ar-title" lang="ar">ألف باء</span>
+  </header>
+  <main id="units"></main>
+</div>
+<script>
+{
+  // One entry per lesson. Add new lessons here; units are grouped and sorted automatically.
+  const LESSONS = [
+    { unit: 8, name: "New Vocab", href: "unit-08/new-vocab/", meta: "Formal · Levantine · Egyptian · 25 words" }
+  ];
+
+  const byUnit = {};
+  LESSONS.forEach(l => (byUnit[l.unit] = byUnit[l.unit] || []).push(l));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  document.getElementById("units").innerHTML = Object.keys(byUnit)
+    .sort((a, b) => a - b)
+    .map(u => `
+      <section class="unit">
+        <h2>Unit ${esc(u)}</h2>
+        <div class="list">
+          ${byUnit[u].map(l => `
+            <a class="item" href="${esc(l.href)}">
+              <div><div class="name">${esc(l.name)}</div><div class="meta">${esc(l.meta)}</div></div>
+              <span class="go" aria-hidden="true">→</span>
+            </a>`).join("")}
+        </div>
+      </section>`).join("");
+}
+</script>
+</body>
+</html>
