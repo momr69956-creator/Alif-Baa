@@ -48,22 +48,27 @@ a.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </div>
 <script>
 {
-  // One entry per lesson. Add new lessons here; units are grouped and sorted automatically.
+  // One entry per page. Give each entry either a unit or a lesson number;
+  // entries are grouped under "Unit N" / "Lesson N" and sorted automatically (units first).
   const LESSONS = [
-    { unit: 8, name: "New Vocab", href: "unit-08/new-vocab/", meta: "Formal · Levantine · Egyptian · 25 words" }
+    { unit: 8,   name: "New Vocab",  href: "unit-08/new-vocab/",     meta: "Formal · Levantine · Egyptian · 25 words" },
+    { lesson: 1, name: "Exercise 8", href: "lesson-01/exercise-08/", meta: "⁨ما السؤال؟⁩ · 9 questions · check answers" }
   ];
 
-  const byUnit = {};
-  LESSONS.forEach(l => (byUnit[l.unit] = byUnit[l.unit] || []).push(l));
+  const groups = {};
+  LESSONS.forEach(l => {
+    const key = l.unit != null ? `u${l.unit}` : `l${l.lesson}`;
+    (groups[key] = groups[key] || { kind: l.unit != null ? "Unit" : "Lesson", n: l.unit ?? l.lesson, items: [] }).items.push(l);
+  });
   const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-  document.getElementById("units").innerHTML = Object.keys(byUnit)
-    .sort((a, b) => a - b)
-    .map(u => `
+  document.getElementById("units").innerHTML = Object.values(groups)
+    .sort((a, b) => (a.kind === b.kind ? a.n - b.n : a.kind === "Unit" ? -1 : 1))
+    .map(g => `
       <section class="unit">
-        <h2>Unit ${esc(u)}</h2>
+        <h2>${g.kind} ${esc(g.n)}</h2>
         <div class="list">
-          ${byUnit[u].map(l => `
+          ${g.items.map(l => `
             <a class="item" href="${esc(l.href)}">
               <div><div class="name">${esc(l.name)}</div><div class="meta">${esc(l.meta)}</div></div>
               <span class="go" aria-hidden="true">→</span>

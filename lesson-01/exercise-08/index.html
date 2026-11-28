@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ما السؤال؟ · تمرين ٨ أ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Scheherazade+New:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#FAF8F4;
+  --surface:#FFFFFF;
+  --ink:#1F1D1A;
+  --ink-2:#4A463F;
+  --muted:#8B857A;
+  --line:#E9E4DB;
+  --line-soft:#F1ECE4;
+
+  --chip:#5B3FB8;        /* question words */
+  --chip-soft:#EFEAFB;
+  --chip-line:#D6CBF5;
+  --reply:#0F6F5C;       /* the answer half of each line */
+  --num:#B5651D;
+  --num-soft:#FBEFE2;
+
+  --good:#1C7C4A;
+  --good-soft:#E5F4EA;
+  --bad:#B0442F;
+  --bad-soft:#FBEDE9;
+  --show:#1D5FBF;
+  --show-soft:#E8F0FC;
+  --empty:#C08A12;
+  --empty-soft:#FDF5E1;
+
+  --sans:"Instrument Sans", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --arabic:"Scheherazade New", "Scheherazade", "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", serif;
+  --shadow:0 1px 2px rgba(31,29,26,.05), 0 8px 24px -12px rgba(31,29,26,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+:focus-visible{outline:2px solid var(--chip);outline-offset:2px;border-radius:6px}
+.ar{font-family:var(--arabic);direction:rtl;font-weight:500}
+.tr{font-family:var(--sans);direction:ltr;unicode-bidi:isolate;color:var(--muted);font-size:14.5px;letter-spacing:.01em}
+body.no-tr .tr{display:none}
+
+.wrap{max-width:860px;margin:0 auto;padding:0 22px}
+
+/* ---------- header ---------- */
+header{padding:34px 0 8px}
+h1{margin:0;font-family:var(--arabic);font-weight:600;font-size:40px;line-height:1.3;direction:rtl;text-align:right}
+.instr{margin:10px 0 0;color:var(--ink-2);font-size:15.5px;max-width:640px}
+.instr .ar{font-size:22px;line-height:1;color:var(--ink)}
+.opts{display:flex;justify-content:flex-end;margin-top:14px}
+.toggle{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink-2);cursor:pointer;user-select:none}
+.toggle input{position:absolute;opacity:0;pointer-events:none}
+.sw{width:34px;height:20px;border-radius:20px;background:var(--line);position:relative;transition:background .15s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.toggle input:checked + .sw{background:var(--chip)}
+.toggle input:checked + .sw::after{transform:translateX(14px)}
+.toggle input:focus-visible + .sw{outline:2px solid var(--chip);outline-offset:2px}
+
+/* ---------- word bank ---------- */
+.bank-bar{
+  position:sticky;top:0;z-index:10;
+  background:rgba(250,248,244,.93);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin-top:16px;
+}
+.bank-in{padding:12px 0 12px}
+.bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;direction:rtl}
+.chip{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:74px;padding:4px 16px 6px;border-radius:12px;
+  background:var(--chip-soft);border:1.5px solid var(--chip-line);color:var(--chip);
+  cursor:grab;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  transition:transform .12s, box-shadow .12s, background .12s, border-color .12s;
+}
+.chip:hover{transform:translateY(-1px);box-shadow:0 4px 12px -6px rgba(91,63,184,.45)}
+.chip .ar{font-size:30px;line-height:1.35;font-weight:600}
+.chip .tr{font-size:12px;color:#7D68C9;margin-top:-2px}
+.chip.sel{background:var(--chip);border-color:var(--chip);color:#fff;box-shadow:0 6px 16px -6px rgba(91,63,184,.6)}
+.chip.sel .tr{color:#E3DBFB}
+.chip.dragging{opacity:.45}
+.hint{text-align:center;font-size:12.5px;color:var(--muted);margin-top:8px}
+
+/* ---------- items ---------- */
+main{padding:22px 0 10px}
+.list{display:flex;flex-direction:column;gap:14px}
+.item{
+  display:grid;grid-template-columns:44px 1fr 34px;gap:14px;align-items:start;direction:rtl;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px 16px 16px;box-shadow:var(--shadow);
+  transition:border-color .2s, background .2s;
+}
+.num{
+  width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+  background:var(--num-soft);color:var(--num);font-family:var(--arabic);font-size:24px;font-weight:600;
+  margin-top:6px;
+}
+.body{min-width:0}
+.q{font-size:32px;line-height:1.9;text-align:right}
+.a{font-size:28px;line-height:1.7;text-align:right;color:var(--reply)}
+.a .dash{color:#9BC3B9;margin-left:.35em}
+.q + .tr{margin:-4px 0 6px;text-align:left}
+.a + .tr{margin-top:-2px;text-align:left;color:#6E9D92}
+.tr .tb{display:inline-block;min-width:3.2em;border-bottom:1.5px solid #CFC8BB;text-align:center;color:var(--chip);font-weight:600}
+.tr .tb.filled{border-bottom-color:transparent;min-width:0}
+.en{direction:ltr;unicode-bidi:isolate;font-family:var(--sans);font-size:.62em;font-weight:500;color:var(--ink-2);padding:0 .15em}
+
+.blank{
+  display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;
+  min-width:3.6em;height:1.45em;margin:0 .12em;padding:0 .35em;
+  border:2px dashed #CFC8BB;border-radius:10px;background:#FCFBF8;
+  font-family:var(--arabic);font-size:1em;font-weight:600;color:var(--chip);line-height:1;
+  transition:border-color .12s, background .12s, color .12s, box-shadow .12s;
+  position:relative;top:-.06em;
+}
+.blank:hover{border-color:var(--chip-line);background:var(--chip-soft)}
+.blank.active{border-color:var(--chip);border-style:solid;background:var(--chip-soft);box-shadow:0 0 0 4px rgba(91,63,184,.12)}
+.blank.over{border-color:var(--chip);border-style:solid;background:var(--chip-soft)}
+.blank.filled{border-style:solid;border-color:var(--chip-line);background:var(--chip-soft)}
+.blank.good{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.blank.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);text-decoration:line-through;text-decoration-thickness:2px}
+.blank.empty{border-color:var(--empty);background:var(--empty-soft)}
+.blank.shown{border-color:var(--show);background:var(--show-soft);color:var(--show);border-style:solid}
+.blank.locked{cursor:default}
+
+.mark{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;margin-top:10px;font-size:16px;font-weight:700;font-family:var(--sans)}
+.item.good{border-color:#BFE3CB}
+.item.good .mark{background:var(--good-soft);color:var(--good)}
+.item.bad{border-color:#F0C9BF}
+.item.bad .mark{background:var(--bad-soft);color:var(--bad)}
+.item.empty{border-color:#EBD7A3}
+.item.empty .mark{background:var(--empty-soft);color:var(--empty)}
+.item.shown{border-color:#C6D8F3}
+.item.shown .mark{background:var(--show-soft);color:var(--show)}
+
+/* ---------- actions ---------- */
+.actions{
+  position:sticky;bottom:0;z-index:10;margin-top:18px;
+  background:rgba(250,248,244,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);
+}
+.actions-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 0 16px}
+.btn{
+  padding:11px 20px;border-radius:11px;font-size:15px;font-weight:600;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--ink-2);
+  transition:background .15s,border-color .15s,color .15s,opacity .15s;
+}
+.btn:hover{border-color:#D3CCBF;color:var(--ink)}
+.btn.primary{background:var(--chip);border-color:var(--chip);color:#fff}
+.btn.primary:hover{background:#4C33A0;border-color:#4C33A0;color:#fff}
+.btn[hidden]{display:none}
+.score{margin-left:auto;display:flex;align-items:baseline;gap:8px;font-weight:600}
+.score .big{font-size:24px;letter-spacing:-.01em}
+.score .lbl{font-size:13px;color:var(--muted);font-weight:500}
+.score.perfect .big{color:var(--good)}
+
+@media (max-width:600px){
+  .wrap{padding:0 14px}
+  h1{font-size:32px}
+  .item{grid-template-columns:34px 1fr 26px;gap:10px;padding:13px 12px 13px 10px}
+  .num{width:32px;height:32px;font-size:20px}
+  .mark{width:24px;height:24px;font-size:13px}
+  .q{font-size:27px}
+  .a{font-size:24px}
+  header{padding-top:22px}
+  .bank-in{padding:8px 0 7px}
+  .bank{gap:4px}
+  .chip{min-width:0;padding:1px 7px 3px;border-radius:10px}
+  .chip .ar{font-size:22px;line-height:1.3}
+  .chip .tr{font-size:10.5px}
+  .hint{font-size:11px;margin-top:5px}
+  .actions{position:static;background:none;border-top:0}
+  .actions-in{gap:8px;padding:6px 0 28px}
+  .btn{padding:9px 11px;font-size:13.5px}
+  .score{width:100%;margin-left:0;justify-content:center;order:-1}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>تمرين ٨ - أ: ما السؤال؟ (في البيت)</h1>
+    <p class="instr">Choose the appropriate <span class="ar">فصحى</span> interrogative particle to complete each question by dragging the best answer from the menu.</p>
+    <div class="opts">
+      <label class="toggle"><input type="checkbox" id="trToggle" checked><span class="sw"></span>Transliteration</label>
+    </div>
+  </header>
+</div>
+
+<div class="bank-bar">
+  <div class="wrap bank-in">
+    <div class="bank" id="bank" role="toolbar" aria-label="Question words"></div>
+    <div class="hint">Drag a word into a blank — or tap a word, then tap a blank.</div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="list" id="list"></div>
+</main>
+
+<div class="actions">
+  <div class="wrap actions-in">
+    <button class="btn primary" id="checkBtn">Check answers</button>
+    <button class="btn" id="retryBtn" hidden>Try again</button>
+    <button class="btn" id="showBtn" hidden>Show answers</button>
+    <button class="btn" id="resetBtn">Reset</button>
+    <div class="score" id="score" hidden><span class="big" id="scoreNum"></span><span class="lbl">correct</span></div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  {ar:"أين",    tr:"ayna"},
+  {ar:"كيف",    tr:"kayfa"},
+  {ar:"ما",     tr:"maa"},
+  {ar:"ماذا",   tr:"maadhaa"},
+  {ar:"من",     tr:"man"},
+  {ar:"من أين", tr:"min ayna"},
+  {ar:"هل",     tr:"hal"}
+];
+const TR = Object.fromEntries(WORDS.map(w => [w.ar, w.tr]));
+
+const ITEMS = [
+  {pre:"", post:"أنـت يـا مـاجـدة؟", a:"أنـا مـن مـديـنـة بـغـداد.",
+   key:"من أين", qtrPre:"", qtrPost:"anti yaa maajida?", atr:"ana min madiinat baghdaad."},
+  {pre:"", post:"أنـت سـوريـة؟", a:"لا، أنـا فـلـسـطـيـنـيـة.",
+   key:"هل", qtrPre:"", qtrPost:"anti suuriyya?", atr:"laa, ana filasTiiniyya."},
+  {pre:"مـن فـضـلـك،", post:"مـكـتـب الـدكـتـور سـامـي الـخـوري؟", a:"فـي هـذه الـبـنـايـة.",
+   key:"أين", qtrPre:"min faDlak,", qtrPost:"maktab ad-duktuur saami l-khuuri?", atr:"fii haadhihi l-binaaya."},
+  {pre:"", post:"هـي؟", a:"هـي الأسـتـاذة الـجـديـدة.",
+   key:"من", qtrPre:"", qtrPost:"hiya?", atr:"hiya l-ustaadha l-jadiida."},
+  {pre:"", post:"تـسـكـن يـا عـلـي؟", a:"أسـكـن فـي شـارع بـور سـعـيـد.",
+   key:"أين", qtrPre:"", qtrPost:"taskun yaa ‘ali?", atr:"askun fii shaari‘ buur sa‘iid."},
+  {pre:"", post:"تـدرس فـي الـجـامـعـة؟", a:"أدرس الأدب.",
+   key:"ماذا", qtrPre:"", qtrPost:"tadrus fi l-jaami‘a?", atr:"adrus al-adab."},
+  {pre:"", post:"هـذه؟", a:"هـذه قـهـوة عـربـيـة.",
+   key:"ما", qtrPre:"", qtrPost:"haadhihi?", atr:"haadhihi qahwa ‘arabiyya."},
+  {pre:"", post:"يـعـمـل والـد أحـمـد؟", a:"هـو دكـتـور.",
+   key:"ماذا", qtrPre:"", qtrPost:"ya‘mal waalid aHmad?", atr:"huwa duktuur."},
+  {pre:"مـن فـضـلـك يـا أستـاذ،", post:"نـقـول <span class=\"en\">bathroom</span> بـالـعـربـيـة؟", a:"\"حـَمّـام\".",
+   key:"كيف", qtrPre:"min faDlak yaa ustaadh,", qtrPost:"naquul bathroom bi-l-‘arabiyya?", atr:"\"Hammaam\"."}
+];
+
+const AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const toAr = n => String(n).replace(/\d/g, d => AR_DIGITS[d]);
+
+/* state per item: val (string|null), status: null|'good'|'bad'|'empty'|'shown' */
+const state = ITEMS.map(() => ({val:null, status:null}));
+let selChip = null;      // selected word (string)
+let activeBlank = null;  // index
+let checked = false;
+
+const $ = s => document.querySelector(s);
+const bank = $("#bank"), list = $("#list");
+
+/* ---------- render ---------- */
+WORDS.forEach(w => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.draggable = true; b.dataset.w = w.ar;
+  b.setAttribute("aria-pressed", "false");
+  b.innerHTML = `<span class="ar">${w.ar}</span><span class="tr">${w.tr}</span>`;
+  b.addEventListener("click", () => onChip(w.ar));
+  b.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", w.ar);
+    e.dataTransfer.effectAllowed = "copy";
+    b.classList.add("dragging");
+  });
+  b.addEventListener("dragend", () => b.classList.remove("dragging"));
+  bank.appendChild(b);
+});
+
+ITEMS.forEach((it, i) => {
+  const el = document.createElement("div");
+  el.className = "item"; el.dataset.i = i;
+  el.innerHTML = `
+    <div class="num">${toAr(i+1)}</div>
+    <div class="body">
+      <div class="q ar">${it.pre ? it.pre + " " : ""}<button class="blank" data-i="${i}" aria-label="Blank ${i+1}"></button> ${it.post}</div>
+      <div class="tr">${it.qtrPre ? it.qtrPre + " " : ""}<span class="tb" data-i="${i}">&nbsp;</span> ${it.qtrPost}</div>
+      <div class="a ar"><span class="dash">—</span>${it.a}</div>
+      <div class="tr">${it.atr}</div>
+    </div>
+    <div class="mark" aria-hidden="true"></div>`;
+  const blank = el.querySelector(".blank");
+  blank.addEventListener("click", () => onBlank(i));
+  blank.addEventListener("dragover", e => { if (!isLocked(i)) { e.preventDefault(); blank.classList.add("over"); } });
+  blank.addEventListener("dragleave", () => blank.classList.remove("over"));
+  blank.addEventListener("drop", e => {
+    e.preventDefault(); blank.classList.remove("over");
+    const w = e.dataTransfer.getData("text/plain");
+    if (w && TR[w] && !isLocked(i)) { place(i, w); setSel(null); setActive(null); }
+  });
+  list.appendChild(el);
+});
+
+/* ---------- interaction ---------- */
+const isLocked = i => state[i].status === "good" || state[i].status === "shown";
+
+function setSel(w){
+  selChip = w;
+  bank.querySelectorAll(".chip").forEach(c => {
+    const on = c.dataset.w === w;
+    c.classList.toggle("sel", on); c.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+function setActive(i){
+  activeBlank = i;
+  list.querySelectorAll(".blank").forEach(b => b.classList.toggle("active", +b.dataset.i === i));
+}
+function nextEmpty(from){
+  for (let k = 1; k <= ITEMS.length; k++){
+    const j = (from + k) % ITEMS.length;
+    if (!state[j].val && !isLocked(j)) return j;
+  }
+  return null;
+}
+function onChip(w){
+  if (activeBlank !== null && !isLocked(activeBlank)){
+    const i = activeBlank;
+    place(i, w);
+    setActive(nextEmpty(i));
+    setSel(null);
+  } else {
+    setSel(selChip === w ? null : w);
+  }
+}
+function onBlank(i){
+  if (isLocked(i)) return;
+  if (selChip){
+    place(i, selChip); setSel(null); setActive(null);
+  } else if (state[i].val){
+    place(i, null); setActive(i);
+  } else {
+    setActive(activeBlank === i ? null : i);
+  }
+}
+function place(i, w){
+  state[i].val = w;
+  state[i].status = null;
+  paint(i);
+}
+
+function paint(i){
+  const s = state[i];
+  const item = list.children[i];
+  const b = item.querySelector(".blank");
+  const tb = item.querySelector(".tb");
+  b.textContent = s.val || "";
+  b.className = "blank" + (s.val ? " filled" : "") + (s.status ? " " + s.status : "") + (isLocked(i) ? " locked" : "") + (activeBlank === i ? " active" : "");
+  b.setAttribute("aria-label", `Blank ${i+1}` + (s.val ? `: ${s.val}` : ": empty"));
+  tb.textContent = s.val ? TR[s.val] : " ";
+  tb.className = "tb" + (s.val ? " filled" : "");
+  item.className = "item" + (s.status ? " " + s.status : "");
+  const mark = item.querySelector(".mark");
+  mark.textContent = {good:"✓", bad:"✗", empty:"?", shown:"•"}[s.status] || "";
+}
+
+/* ---------- buttons ---------- */
+const checkBtn = $("#checkBtn"), retryBtn = $("#retryBtn"), showBtn = $("#showBtn"), resetBtn = $("#resetBtn");
+const scoreBox = $("#score"), scoreNum = $("#scoreNum");
+
+function updateScore(){
+  const n = state.filter(s => s.status === "good").length;
+  scoreNum.textContent = `${n} / ${ITEMS.length}`;
+  scoreBox.hidden = false;
+  scoreBox.classList.toggle("perfect", n === ITEMS.length);
+  const anyWrong = state.some(s => s.status === "bad" || s.status === "empty");
+  retryBtn.hidden = !anyWrong;
+  showBtn.hidden = !anyWrong;
+}
+
+checkBtn.addEventListener("click", () => {
+  setSel(null); setActive(null);
+  state.forEach((s, i) => {
+    if (s.status === "shown") return;
+    s.status = !s.val ? "empty" : (s.val === ITEMS[i].key ? "good" : "bad");
+    paint(i);
+  });
+  checked = true;
+  updateScore();
+});
+
+retryBtn.addEventListener("click", () => {
+  state.forEach((s, i) => {
+    if (s.status === "bad" || s.status === "empty"){ s.val = null; s.status = null; paint(i); }
+  });
+  retryBtn.hidden = true; showBtn.hidden = true;
+  const first = nextEmpty(-1);
+  setActive(first);
+  if (first !== null) list.children[first].scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+showBtn.addEventListener("click", () => {
+  setSel(null); setActive(null);
+  state.forEach((s, i) => {
+    if (s.status !== "good"){ s.val = ITEMS[i].key; s.status = "shown"; paint(i); }
+  });
+  retryBtn.hidden = true; showBtn.hidden = true;
+});
+
+resetBtn.addEventListener("click", () => {
+  setSel(null); setActive(null);
+  state.forEach((s, i) => { s.val = null; s.status = null; paint(i); });
+  checked = false;
+  scoreBox.hidden = true; retryBtn.hidden = true; showBtn.hidden = true;
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+$("#trToggle").addEventListener("change", e => {
+  document.body.classList.toggle("no-tr", !e.target.checked);
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape"){ setSel(null); setActive(null); }
+});
+
+ITEMS.forEach((_, i) => paint(i));
+</script>
+</body>
+</html>
